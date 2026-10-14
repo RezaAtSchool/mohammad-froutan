@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>کارهای روزانه من</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f2f4fb;
+      color: #26324b;
+      line-height: 1.8;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 600px;
+      margin: 40px auto;
+    }
+
+    header {
+      background: linear-gradient(135deg, #5145cd, #8878ff);
+      color: white;
+      padding: 25px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      margin: 0 0 5px;
+      font-size: 26px;
+    }
+
+    header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: white;
+      padding: 22px;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px #26324b0c;
+      margin-bottom: 18px;
+    }
+
+    .form {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid #dce1ed;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #6558e8;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .add-button {
+      background: #6558e8;
+      color: white;
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .task {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid #edf0f6;
+    }
+
+    .task:last-child {
+      border-bottom: none;
+    }
+
+    .task input {
+      width: 18px;
+      height: 18px;
+      accent-color: #6558e8;
+      cursor: pointer;
+    }
+
+    .task-text {
+      flex: 1;
+      overflow-wrap: anywhere;
+    }
+
+    .task.done .task-text {
+      text-decoration: line-through;
+      color: #9299a9;
+    }
+
+    .delete-button {
+      background: #fff0f0;
+      color: #d94343;
+    }
+
+    .empty {
+      text-align: center;
+      color: #9299a9;
+      padding: 15px 0;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: #737d93;
+    }
+
+    .stats strong {
+      color: #5145cd;
+    }
+
+    @media (max-width: 450px) {
+      .container {
+        width: calc(100% - 24px);
+        margin: 20px auto;
+      }
+
+      .form {
+        flex-direction: column;
+      }
+
+      .add-button {
+        width: 100%;
+      }
+
+      .card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <header>
+      <h1>📚 کارهای روزانه من</h1>
+      <p>قدم‌های کوچک، موفقیت‌های بزرگ!</p>
+    </header>
+
+    <section class="card">
+      <h2>➕ افزودن کار جدید</h2>
+
+      <form class="form" id="taskForm">
+        <input
+          type="text"
+          id="taskInput"
+          placeholder="مثلاً انجام تکالیف ریاضی..."
+          autocomplete="off"
+          required
+        >
+        <button class="add-button" type="submit">
+          افزودن کار
+        </button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>✅ فهرست کارها</h2>
+
+      <ul class="task-list" id="taskList"></ul>
+
+      <p class="empty" id="emptyMessage">
+        هنوز کاری ثبت نکرده‌ای!
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="stats">
+        <span>همه کارها: <strong id="totalCount">۰</strong></span>
+        <span>انجام‌شده: <strong id="doneCount">۰</strong></span>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const form = document.getElementById("taskForm");
+    const input = document.getElementById("taskInput");
+    const list = document.getElementById("taskList");
+    const emptyMessage = document.getElementById("emptyMessage");
+    const totalCount = document.getElementById("totalCount");
+    const doneCount = document.getElementById("doneCount");
+
+    const numberFormat = new Intl.NumberFormat("fa-IR");
+
+    function updateStats() {
+      const tasks = list.querySelectorAll(".task");
+      const completed = list.querySelectorAll(".task.done");
+
+      totalCount.textContent = numberFormat.format(tasks.length);
+      doneCount.textContent = numberFormat.format(completed.length);
+
+      emptyMessage.hidden = tasks.length > 0;
+    }
+
+    function addTask(text) {
+      const li = document.createElement("li");
+      li.className = "task";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.setAttribute("aria-label", "علامت‌گذاری به‌عنوان انجام‌شده");
+
+      const span = document.createElement("span");
+      span.className = "task-text";
+      span.textContent = text;
+
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "delete-button";
+      deleteButton.textContent = "حذف";
+
+      checkbox.addEventListener("change", function () {
+        li.classList.toggle("done", checkbox.checked);
+        updateStats();
+      });
+
+      deleteButton.addEventListener("click", function () {
+        li.remove();
+        updateStats();
+      });
+
+      li.append(checkbox, span, deleteButton);
+      list.appendChild(li);
+
+      updateStats();
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const text = input.value.trim();
+
+      if (text === "") {
+        return;
+      }
+
+      addTask(text);
+      input.value = "";
+      input.focus();
+    });
+
+    updateStats();
+  </script>
+</body>
+</html>
